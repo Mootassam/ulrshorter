@@ -1,11 +1,30 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
-import ShortLink from "./view/shortLink/shorLink";
-
+import "firebase/compat/auth";
+import "firebase/compat/database";
+import { auth, provider } from "./firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { signInWithPopup } from "firebase/auth";
 function App() {
-  const [count, setCount] = useState(0);
+  const [user] = useAuthState(auth);
+
+  const getFirstName = (fullName:any) => {
+    const namePart = fullName.split(" ");
+    if (namePart.length > 0) {
+      return namePart[0];
+    }
+    return fullName;
+  };
+
+  const signIn = async () => {
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      alert(error);
+    }
+  };
+  const signOut = () => {
+    auth.signOut();
+  };
 
   return (
     <div className="app">
@@ -15,7 +34,31 @@ function App() {
         </div>
         <div className="app__center"></div>
         <div className="app__right">
-          <div className="app__login">Login</div>
+          {user ? (
+            <div className="user__name">
+              <div className="name__left">
+                <span className="welcome"> Welcome</span>
+                <span className="user__loginame">
+                  {getFirstName(user.displayName)}
+                </span>
+              </div>
+              <div className="name__right">
+                <label htmlFor="toggleDropdown" className="name__right-label">
+                  <img src="/down.png" alt="" />
+                </label>
+              </div>
+              <div className="dropdwon">
+                <div onClick={signOut}>
+                  <label className="signout">Sign Out</label>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="app__login" onClick={signIn}>
+              Login
+            </div>
+          )}
+
           <div className="app__register"> Register</div>
         </div>
       </div>
@@ -99,26 +142,6 @@ function App() {
                 <span className="inactive">Inavtive</span>
                 <div className="link__active">
                   <img src="/unlink.png" alt="" />
-                </div>
-              </td>
-              <td>Oct - 10 -2023</td>
-            </tr>
-            <tr>
-              <td className="td__detail">
-                https://linkly.com/Bn41aCOlnxj
-                <div className="copy">
-                  <img src="/copy.png" alt="" />
-                </div>
-              </td>
-              <td>https://www.twitter.com/tweets/8erelCoihu/</td>
-              <td>
-                <img src="/qrcode.png" alt="" />
-              </td>
-              <td>1313</td>
-              <td className="status">
-                <span className="active">Active</span>
-                <div className="link__active">
-                  <img src="/link1.png" alt="" />
                 </div>
               </td>
               <td>Oct - 10 -2023</td>

@@ -134,7 +134,7 @@ img {
   width: 374px;
 }
 .url__short:focus {
-  border: 0;
+  outline: none;
 }
 
 .input__short {
@@ -298,7 +298,7 @@ tbody {
 
 tr {
   margin: 3px 0;
-  text-align : center;
+  text-align: center;
 }
 
 .inactive {
@@ -316,4 +316,86 @@ tr {
   align-items: center;
   justify-content: center;
   gap: 10px;
+}
+
+.user__name {
+  border-radius: 48px;
+  border: 1px solid #353c4a;
+  background: #181e29;
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.1);
+  display: flex;
+  width: 191px;
+  height: 60px;
+  padding: 21px 25.188px 21px 25px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  position: relative;
+}
+
+.name__left {
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.welcome {
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 18px; /* 180% */
+}
+
+.user__loginame {
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 18px; /* 112.5% */
+}
+
+.toggle-dropdown-checkbox {
+  display: none;
+}
+.dropdwon {
+  display: none;
+}
+
+/* When the checkbox is checked, show the .dropdwon */
+.toggle-dropdown-checkbox:checked {
+}
+
+.dropdwon {
+  display: block;
+  position: absolute;
+  bottom: -45px;
+  background-color: #fff;
+  width: 160px;
+  height: max-content;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.signout { 
+  color: #000;
+  text-align: center;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 18px; /* 112.5% */
+  cursor: pointer;
+}
+.signout:hover { 
+  background-color: #5d6474;
+  width: 100%;
+  color: white;
 }
