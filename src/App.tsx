@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import "firebase/compat/auth";
 import "firebase/compat/database";
@@ -7,6 +7,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { signInWithPopup } from "firebase/auth";
 import axios from "axios";
 import Date from "./modules/shared/date";
+import { getDatabase, ref, set, onValue, push, child } from "firebase/database";
 
 import QRCode from "react-qr-code";
 
@@ -15,7 +16,36 @@ function App() {
   const [url, setUrl] = useState();
   const [shortUrl, setShortUrl] = useState("");
   const [date, setDate] = useState("");
+  const [links, setLinks] = useState<any>();
 
+  const getLinks = () => {
+    const database = getDatabase();
+    const cartRef = ref(database, "links/");
+
+    onValue(cartRef, (snapshot) => {
+      const dataObject = snapshot.val();
+      if (dataObject) {
+        const dataArray = [];
+        for (const key in dataObject) {
+          if (dataObject.hasOwnProperty(key)) {
+            dataArray.push(dataObject[key]);
+          }
+        }
+        setLinks(dataArray);
+      } else {
+        setLinks([]); // If no data is available, set an empty array
+      }
+    });
+  };
+
+  useEffect(() => {
+    getLinks();
+  }, []);
+
+  useEffect(() => {
+    console.log(links);
+    // This will log the data after it has been fetched.
+  }, [links]);
   const getFirstName = (fullName: any) => {
     const namePart = fullName.split(" ");
     if (namePart.length > 0) {
@@ -58,6 +88,30 @@ function App() {
       .then((res) => {
         setShortUrl(res.data.data.tiny_url);
         setDate(res.data.data.created_at);
+
+        const database = getDatabase();
+        const userId = user ? user.uid : "";
+        const linksRef = ref(database, "links/");
+        const data = {
+          userId: userId,
+          links: {
+            urlshort: res.data.data.tiny_url,
+            originalLink: url,
+            status: "active",
+            date: Date.createdAt(),
+          },
+        };
+
+        // Push a new child under the user's node
+        const newLinkRef = push(linksRef);
+        // Set the data under the new unique key
+        set(newLinkRef, data)
+          .then(() => {
+            // Success.
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       });
   };
 
@@ -69,6 +123,8 @@ function App() {
         </div>
         <div className="app__center"></div>
         <div className="app__right">
+
+
           {user ? (
             <div className="user__name">
               <div className="name__left">
@@ -127,6 +183,7 @@ function App() {
           more links. Click here
         </span>
       </div>
+      
       <div className="app__table">
         <table>
           <thead>
@@ -142,7 +199,7 @@ function App() {
               </td>
             </tr>
           </thead>
-
+          
           <tbody>
             <tr>
               <td className="td__detail">
@@ -178,8 +235,9 @@ function App() {
                   <img src="/link1.png" alt="" />
                 </div>
               </td>
-              <td> {date ? Date.createdAt(date) : "_ _ _"}</td>
+              <td> {date ? Date.createdAt() : "_ _ _"}</td>
             </tr>
+
             <tr>
               <td className="td__detail">
                 https://linkly.com/Bn41aCOlnxj
