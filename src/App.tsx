@@ -1,13 +1,22 @@
+import React, { useState } from "react";
 import "./App.css";
 import "firebase/compat/auth";
 import "firebase/compat/database";
 import { auth, provider } from "./firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { signInWithPopup } from "firebase/auth";
+import axios from "axios";
+import Date from "./modules/shared/date";
+
+import QRCode from "react-qr-code";
+
 function App() {
   const [user] = useAuthState(auth);
+  const [url, setUrl] = useState();
+  const [shortUrl, setShortUrl] = useState("");
+  const [date, setDate] = useState("");
 
-  const getFirstName = (fullName:any) => {
+  const getFirstName = (fullName: any) => {
     const namePart = fullName.split(" ");
     if (namePart.length > 0) {
       return namePart[0];
@@ -26,11 +35,37 @@ function App() {
     auth.signOut();
   };
 
+  const handletext = (event: any) => {
+    const value = event.target.value;
+    setUrl(value);
+  };
+  const shortLink = () => {
+    axios
+      .post(
+        "https://api.tinyurl.com/create",
+        {
+          url: url,
+        },
+        {
+          headers: {
+            "content-type": "text/json",
+
+            Authorization:
+              "Bearer Jm0FUupFHrdPTjr677duNq7vjai0KpK93es3nAM4xPPjZ9g04IlihEB76JMS",
+          },
+        }
+      )
+      .then((res) => {
+        setShortUrl(res.data.data.tiny_url);
+        setDate(res.data.data.created_at);
+      });
+  };
+
   return (
     <div className="app">
       <div className="app__header">
         <div className="app__left">
-          <img src="/logo.png" alt="" width={110} height={46} />
+          <img src="/logo.png" alt="" width={110} height={40} />
         </div>
         <div className="app__center"></div>
         <div className="app__right">
@@ -47,10 +82,8 @@ function App() {
                   <img src="/down.png" alt="" />
                 </label>
               </div>
-              <div className="dropdwon">
-                <div onClick={signOut}>
-                  <label className="signout">Sign Out</label>
-                </div>
+              <div className="dropdwon" onClick={signOut}>
+                <label className="signout">Sign Out</label>
               </div>
             </div>
           ) : (
@@ -75,9 +108,15 @@ function App() {
           <div className="input__short">
             <div className="short__left">
               <img src="/link.png" alt="" />
-              <input type="text" className="url__short" />
+              <input
+                type="text"
+                className="url__short"
+                onChange={() => handletext(event)}
+              />
             </div>
-            <div className="short__now">Shorten Now!</div>
+            <div className="short__now" onClick={shortLink}>
+              Shorten Now!
+            </div>
           </div>
         </div>
         <span className="small__description">
@@ -88,7 +127,6 @@ function App() {
           more links. Click here
         </span>
       </div>
-
       <div className="app__table">
         <table>
           <thead>
@@ -108,14 +146,30 @@ function App() {
           <tbody>
             <tr>
               <td className="td__detail">
-                https://linkly.com/Bn41aCOlnxj
+                {shortUrl ? shortUrl : "https://linkly.com/Bn41aCOlnxj"}
                 <div className="copy">
                   <img src="/copy.png" alt="" />
                 </div>
               </td>
-              <td>https://www.twitter.com/tweets/8erelCoihu/</td>
+              <td className="origina__link">
+                {url ? url : "https://www.twitter.com/tweets/8erelCoihu/"}
+              </td>
               <td>
-                <img src="/qrcode.png" alt="" />
+                <div
+                  style={{
+                    height: "auto",
+                    maxWidth: 40,
+                    width: "100%",
+                  }}
+                >
+                  <QRCode
+                    size={256}
+                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                    value={shortUrl}
+                    viewBox={`0 0 256 256`}
+                    bgColor="#73767c"
+                  />
+                </div>
               </td>
               <td>1313</td>
               <td className="status">
@@ -124,7 +178,7 @@ function App() {
                   <img src="/link1.png" alt="" />
                 </div>
               </td>
-              <td>Oct - 10 -2023</td>
+              <td> {date ? Date.createdAt(date) : "_ _ _"}</td>
             </tr>
             <tr>
               <td className="td__detail">

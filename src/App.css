@@ -221,6 +221,7 @@ thead {
   background: #181e29;
   box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(14px);
+  text-align-last: start;
 }
 td {
   padding: 26px 25px;
@@ -243,6 +244,7 @@ tbody {
   box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(28px);
   margin-top: 3px;
+  text-align-last: start;
 }
 .copy {
   display: flex;
@@ -314,7 +316,6 @@ tr {
 .date__ {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 10px;
 }
 
@@ -378,13 +379,14 @@ tr {
   position: absolute;
   bottom: -45px;
   background-color: #fff;
-  width: 160px;
+  width: 100%;
   height: max-content;
-  padding: 10px;
+  padding: 10px 0;
   border-radius: 5px;
+  overflow: hidden;
 }
 
-.signout { 
+.signout {
   color: #000;
   text-align: center;
   font-family: Inter;
@@ -393,9 +395,21 @@ tr {
   font-weight: 600;
   line-height: 18px; /* 112.5% */
   cursor: pointer;
+  padding: 10px;
+  width: 100vw;
+  padding: 10px;
 }
-.signout:hover { 
+.dropdwon:hover {
   background-color: #5d6474;
   width: 100%;
   color: white;
+}
+.signout:hover {
+  color: white;
+}
+
+.origina__link {
+  max-width: 333px;
+  overflow: hidden;
+  height: auto;
 }
