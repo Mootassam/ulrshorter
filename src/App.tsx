@@ -22,6 +22,9 @@ function App() {
   const [user] = useAuthState(auth);
   const [url, setUrl] = useState();
   const [links, setLinks] = useState<any>();
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [selected, setSelectedItem] = useState<any>();
+
   useEffect(() => {
     const q = query(collection(database, "links"), orderBy("date", "desc")); // Change "timestamp" to the actual field you want to use for ordering
 
@@ -39,13 +42,19 @@ function App() {
     };
   }, []);
 
-  const handleCopy = (value: any) => {
+  const handleCopy = (value: any, index: number) => {
     const el = document.createElement("textarea");
     el.value = value;
     document.body.appendChild(el);
     el.select();
     document.execCommand("copy");
     document.body.removeChild(el);
+    setCopySuccess(true);
+    setSelectedItem(index);
+
+    setTimeout(() => {
+      setCopySuccess(false);
+    }, 2000);
   };
   useEffect(() => {
     // This will log the data after it has been fetched.
@@ -193,8 +202,10 @@ function App() {
                 <td className="td__detail">
                   {item.shortlink}
                   <div
-                    className="copy"
-                    onClick={() => handleCopy(item.shortlink)}
+                    className={`copy ${
+                      copySuccess && selected === i ? "copied" : ""
+                    }`}
+                    onClick={() => handleCopy(item.shortlink, i)}
                   >
                     <img src="/copy.png" alt="" />
                   </div>

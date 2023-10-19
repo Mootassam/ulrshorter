@@ -417,3 +417,9 @@ tr {
 .app__footer {
   padding: 50px;
 }
+
+/* Styling for the 'copy' div when it's clicked (e.g., changes background color) */
+.copy.copied {
+  background-color: lightseagreen;
+  transition: background-color 0.3s; /* Add a smooth transition effect */
+}
