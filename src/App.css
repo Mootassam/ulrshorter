@@ -207,6 +207,8 @@ input.url__short {
   cursor: pointer;
 }
 
+
+
 .small__description {
   color: #c9ced6;
   text-align: center;
@@ -607,20 +609,41 @@ tr {
 }
 
 .cancel__now {
-  color: #fff;
+  color: #000;
   text-align: center;
   font-family: Inter;
-  font-size: 16px;
+  font-size: 14px;
   font-style: normal;
   font-weight: 600;
   line-height: 18px; /* 112.5% */
   border-radius: 48px;
   border: 1px solid #c9ced6;
   background: #c9ced6;
+  box-shadow: 10px 9px 22px 0px rgba(31, 33, 37, 0.38);
+  display: flex;
+  width: 150px;
+  padding: 15px;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+
+.save__now { 
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 18px; /* 112.5% */
+  border-radius: 48px;
+  border: 1px solid #144ee3;
+  background: #144ee3;
   box-shadow: 10px 9px 22px 0px rgba(20, 78, 227, 0.38);
   display: flex;
-  width: 178px;
-  padding: 21px 25.047px 21px 25px;
+  width: 150px;
+  padding: 15px;
   justify-content: center;
   align-items: center;
   cursor: pointer;

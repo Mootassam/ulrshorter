@@ -284,7 +284,7 @@ function App() {
             </div>
           <div className="sidebar__content">
 
-            {Array.from({ length: 27 }).map((item, index) => (
+            {Array.from({ length: 12 }).map((item, index) => (
               <div className="content__">
                 <div className="circle">{index + 1}</div>
                 <div className="more__links">
@@ -309,7 +309,7 @@ function App() {
               <div className="cancel__now" onClick={() => setShow(false)}>
                 Cancel Now!
               </div>
-              <div className="short__now">Save Now!</div>
+              <div className="save__now">Save Now!</div>
             </div>
           </div>
         </div>
