@@ -25,7 +25,30 @@ function App() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [selected, setSelectedItem] = useState<any>();
   const [show, setShow] = useState(false);
+  const [form, setNewform] = useState<{ link: string }[]>([
+    {
+      link: "",
+    },
+  ]);
 
+  const addFields = () => {
+    setNewform([
+      ...form,
+      {
+        link: "",
+      },
+    ]);
+  };
+
+  const removeFields = (index: number) => {
+    let formDelete = [...form];
+    formDelete.splice(index, 1);
+    setNewform(formDelete);
+  };
+
+  const saveMultiple = () => {
+    console.log(form);
+  };
   useEffect(() => {
     const q = query(collection(database, "links"), orderBy("date", "desc")); // Change "timestamp" to the actual field you want to use for ordering
 
@@ -63,6 +86,8 @@ function App() {
   };
   useEffect(() => {
     // This will log the data after it has been fetched.
+
+    console.log(form);
   }, [links]);
   const getFirstName = (fullName: any) => {
     const namePart = fullName.split(" ");
@@ -118,6 +143,15 @@ function App() {
       });
   };
 
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    i: number
+  ) => {
+    let formN = [...form];
+    formN[i] = { ...formN[i], [event.target.name]: event.target.value };
+    setNewform(formN);
+  };
+
   return (
     <div className="app">
       <div className="app__header">
@@ -148,7 +182,6 @@ function App() {
               Login
             </div>
           )}
-
           <div className="app__register"> Register</div>
         </div>
       </div>
@@ -200,7 +233,8 @@ function App() {
               <td>Status</td>
               <td className="date__">
                 Date
-                <img src="/date.png" alt="" />
+
+                <img src="/date.png" alt=""  />
               </td>
             </tr>
           </thead>
@@ -245,7 +279,9 @@ function App() {
                 <td className="status">
                   <span className="active">{item.status}</span>
                   <div className="link__active">
+                    <a href={item.shortlink} target="__blank">
                     <img src="/link1.png" alt="" />
+                    </a>
                   </div>
                 </td>
                 <td>{Date.format(item.date)}</td>
@@ -277,15 +313,14 @@ function App() {
       </div>
       {show && (
         <div className="app__sidebar">
-            <div className="content__plus">
-              <div className="plus__link">
-                <i className="fa-solid fa-plus"></i>
-              </div>
+          <div className="content__plus">
+            <div className="plus__link" onClick={() => addFields()}>
+              <i className="fa-solid fa-plus"></i>
             </div>
+          </div>
           <div className="sidebar__content">
-
-            {Array.from({ length: 12 }).map((item, index) => (
-              <div className="content__">
+            {form.map((item, index) => (
+              <div className="content__" key={index}>
                 <div className="circle">{index + 1}</div>
                 <div className="more__links">
                   <div>
@@ -294,12 +329,21 @@ function App() {
                   <input
                     type="text"
                     className="more__link"
+                    name="link"
+                    value={item.link}
                     placeholder="Enter the link here"
+                    onChange={(e) => {
+                      handleChange(e, index);
+                    }}
                   />
                 </div>
-                <div className="cancel">
-                  <i className="fa-solid fa-minus"></i>
-                </div>
+                {index ? (
+                  <div className="cancel" onClick={() => removeFields(index)}>
+                    <i className="fa-solid fa-minus"></i>
+                  </div>
+                ) : (
+                  ""
+                )}
               </div>
             ))}
           </div>
@@ -309,7 +353,9 @@ function App() {
               <div className="cancel__now" onClick={() => setShow(false)}>
                 Cancel Now!
               </div>
-              <div className="save__now">Save Now!</div>
+              <div className="save__now" onClick={() => saveMultiple()}>
+                Save Now!
+              </div>
             </div>
           </div>
         </div>
