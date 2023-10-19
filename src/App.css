@@ -408,9 +408,11 @@ tr {
   color: white;
 }
 
-.origina__link {
-  max-width: 333px;
+.original__link {
+  max-width: 500px;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
   height: auto;
 }
 

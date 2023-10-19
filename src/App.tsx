@@ -210,7 +210,7 @@ function App() {
                     <img src="/copy.png" alt="" />
                   </div>
                 </td>
-                <td className="origina__link">{item.originallink}</td>
+                <td className="original__link">{item.originallink}</td>
                 <td>
                   <div
                     style={{
