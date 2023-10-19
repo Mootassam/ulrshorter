@@ -7,14 +7,14 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { signInWithPopup } from "firebase/auth";
 import axios from "axios";
 import Date from "./modules/shared/date";
+import ClipboardJS from "clipboard";
+
 import {
   collection,
   addDoc,
-  getDocs,
   onSnapshot,
   query,
   orderBy,
-  serverTimestamp,
 } from "firebase/firestore";
 import QRCode from "react-qr-code";
 
@@ -39,6 +39,14 @@ function App() {
     };
   }, []);
 
+  const handleCopy = (value: any) => {
+    const el = document.createElement("textarea");
+    el.value = value;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
+  };
   useEffect(() => {
     // This will log the data after it has been fetched.
   }, [links]);
@@ -184,7 +192,10 @@ function App() {
               <tr key={i}>
                 <td className="td__detail">
                   {item.shortlink}
-                  <div className="copy">
+                  <div
+                    className="copy"
+                    onClick={() => handleCopy(item.shortlink)}
+                  >
                     <img src="/copy.png" alt="" />
                   </div>
                 </td>
