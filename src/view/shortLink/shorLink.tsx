@@ -5,7 +5,6 @@ import "firebase/compat/database";
 import { auth, database, provider } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { signInWithPopup } from "firebase/auth";
-import axios from "axios";
 import Date from "../../modules/shared/date";
 
 import {
@@ -16,6 +15,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import QRCode from "react-qr-code";
+import authAxios from "../../modules/shared/axios/authAxios";
 
 function ShortLink() {
   const [user] = useAuthState(auth);
@@ -113,21 +113,10 @@ function ShortLink() {
   };
 
   const shortLink = () => {
-    axios
-      .post(
-        "https://api.tinyurl.com/create",
-        {
-          url: url,
-        },
-        {
-          headers: {
-            "content-type": "text/json",
-
-            Authorization:
-              "Bearer Jm0FUupFHrdPTjr677duNq7vjai0KpK93es3nAM4xPPjZ9g04IlihEB76JMS",
-          },
-        }
-      )
+    authAxios
+      .post("/create", {
+        url: url,
+      })
       .then(async (res) => {
         try {
           const docRef = await addDoc(collection(database, "links"), {
@@ -160,21 +149,10 @@ function ShortLink() {
         status: "active",
       });
 
-      axios
-        .post(
-          "https://api.tinyurl.com/create",
-          {
-            url: window.location.href + "detail/" + docRefs.id,
-          },
-          {
-            headers: {
-              "content-type": "text/json",
-
-              Authorization:
-                "Bearer Jm0FUupFHrdPTjr677duNq7vjai0KpK93es3nAM4xPPjZ9g04IlihEB76JMS",
-            },
-          }
-        )
+      authAxios
+        .post("/create", {
+          url: window.location.href + "detail/" + docRefs.id,
+        })
         .then(async (res) => {
           try {
             const docRef = await addDoc(collection(database, "links"), {
