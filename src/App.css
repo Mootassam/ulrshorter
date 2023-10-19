@@ -464,7 +464,6 @@ tr {
 /* styling the sidebar */
 .app__sidebar {
   height: 100dvh;
-
   background-color: #0d1117;
   position: absolute;
   right: 0;
@@ -474,8 +473,9 @@ tr {
 
 .sidebar__content {
   padding: 20px;
-  max-height: 90%; /* Set your desired maximum height here */
+  max-height: 80%; /* Set your desired maximum height here */
   overflow-y: auto;
+  
 }
 .sidebar__content::-webkit-scrollbar {
   width: 0; /* Make the scrollbar width zero */
@@ -564,6 +564,32 @@ tr {
   flex-shrink: 0;
   gap: 10px;
   justify-content: center;
+}
+
+.content__plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 13px;
+  margin: 20px;
+}
+.plus__link {
+  border-radius: 48px;
+  border: 2px solid #374a35;
+  background: #122b23;
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.1);
+  display: flex;
+  width: 100%;
+  height: 50px;
+  padding: 21px 25.188px 21px 25px;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 10px;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
 }
 
 .more__link {

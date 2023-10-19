@@ -277,8 +277,14 @@ function App() {
       </div>
       {show && (
         <div className="app__sidebar">
+            <div className="content__plus">
+              <div className="plus__link">
+                <i className="fa-solid fa-plus"></i>
+              </div>
+            </div>
           <div className="sidebar__content">
-            {Array.from({ length: 20 }).map((item, index) => (
+
+            {Array.from({ length: 27 }).map((item, index) => (
               <div className="content__">
                 <div className="circle">{index + 1}</div>
                 <div className="more__links">
