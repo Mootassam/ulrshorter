@@ -164,7 +164,7 @@ function ShortLink() {
         .post(
           "https://api.tinyurl.com/create",
           {
-            url: url,
+            url: window.location.href + "detail/" + docRefs.id,
           },
           {
             headers: {
