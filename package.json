@@ -19,7 +19,8 @@
     "react-dom": "^18.2.0",
     "react-firebase-hooks": "^5.1.1",
     "react-firebaseui": "^6.0.0",
-    "react-qr-code": "^2.0.12"
+    "react-qr-code": "^2.0.12",
+    "react-router-dom": "^6.17.0"
   },
   "devDependencies": {
     "@firebase/app": "^0.9.20",
