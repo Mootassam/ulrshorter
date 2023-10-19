@@ -24,6 +24,7 @@ function App() {
   const [links, setLinks] = useState<any>();
   const [copySuccess, setCopySuccess] = useState(false);
   const [selected, setSelectedItem] = useState<any>();
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
     const q = query(collection(database, "links"), orderBy("date", "desc")); // Change "timestamp" to the actual field you want to use for ordering
@@ -55,6 +56,10 @@ function App() {
     setTimeout(() => {
       setCopySuccess(false);
     }, 2000);
+  };
+
+  const showLink = () => {
+    setShow(true);
   };
   useEffect(() => {
     // This will log the data after it has been fetched.
@@ -176,7 +181,11 @@ function App() {
           <label htmlFor="" className="red">
             05{" "}
           </label>{" "}
-          more links. Click here
+          more links.{" "}
+          <div className="clickhere" onClick={showLink}>
+            {" "}
+            Click here{" "}
+          </div>
         </span>
       </div>
 
@@ -266,6 +275,39 @@ function App() {
           </tbody>
         </table>
       </div>
+      {show && (
+        <div className="app__sidebar">
+          <div className="sidebar__content">
+            {Array.from({ length: 20 }).map((item, index) => (
+              <div className="content__">
+                <div className="circle">{index + 1}</div>
+                <div className="more__links">
+                  <div>
+                    <img src="/link.png" alt="" />
+                  </div>
+                  <input
+                    type="text"
+                    className="more__link"
+                    placeholder="Enter the link here"
+                  />
+                </div>
+                <div className="cancel">
+                  <i className="fa-solid fa-minus"></i>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="sidebar__bottom">
+            <div className="sidebar__save">
+              <div className="cancel__now" onClick={() => setShow(false)}>
+                Cancel Now!
+              </div>
+              <div className="short__now">Save Now!</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="app__footer"></div>
     </div>
