@@ -413,3 +413,7 @@ tr {
   overflow: hidden;
   height: auto;
 }
+
+.app__footer {
+  padding: 50px;
+}

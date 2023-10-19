@@ -2,48 +2,37 @@ import React, { useEffect, useState } from "react";
 import "./App.css";
 import "firebase/compat/auth";
 import "firebase/compat/database";
-import { auth, provider } from "./firebase";
+import { auth, database, provider } from "./firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { signInWithPopup } from "firebase/auth";
 import axios from "axios";
 import Date from "./modules/shared/date";
-import { getDatabase, ref, set, onValue, push, child } from "firebase/database";
-
+import { collection, addDoc, getDocs, onSnapshot } from "firebase/firestore";
 import QRCode from "react-qr-code";
 
 function App() {
   const [user] = useAuthState(auth);
   const [url, setUrl] = useState();
-  const [shortUrl, setShortUrl] = useState("");
-  const [date, setDate] = useState("");
   const [links, setLinks] = useState<any>();
-
-  const getLinks = () => {
-    const database = getDatabase();
-    const cartRef = ref(database, "links/");
-
-    onValue(cartRef, (snapshot) => {
-      const dataObject = snapshot.val();
-      if (dataObject) {
-        const dataArray = [];
-        for (const key in dataObject) {
-          if (dataObject.hasOwnProperty(key)) {
-            dataArray.push(dataObject[key]);
-          }
-        }
-        setLinks(dataArray);
-      } else {
-        setLinks([]); // If no data is available, set an empty array
-      }
-    });
-  };
-
   useEffect(() => {
-    getLinks();
+    const unsubscribe = onSnapshot(
+      collection(database, "links"),
+      (querySnapshot) => {
+        const newData = querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        setLinks(newData);
+      }
+    );
+
+    return () => {
+      // Unsubscribe when the component unmounts to avoid memory leaks
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
-    console.log(links);
     // This will log the data after it has been fetched.
   }, [links]);
   const getFirstName = (fullName: any) => {
@@ -85,33 +74,18 @@ function App() {
           },
         }
       )
-      .then((res) => {
-        setShortUrl(res.data.data.tiny_url);
-        setDate(res.data.data.created_at);
-
-        const database = getDatabase();
-        const userId = user ? user.uid : "";
-        const linksRef = ref(database, "links/");
-        const data = {
-          userId: userId,
-          links: {
-            urlshort: res.data.data.tiny_url,
-            originalLink: url,
-            status: "active",
+      .then(async (res) => {
+        try {
+          const docRef = await addDoc(collection(database, "links"), {
             date: Date.createdAt(),
-          },
-        };
-
-        // Push a new child under the user's node
-        const newLinkRef = push(linksRef);
-        // Set the data under the new unique key
-        set(newLinkRef, data)
-          .then(() => {
-            // Success.
-          })
-          .catch((error) => {
-            console.log(error);
+            originallink: url,
+            shortlink: res.data.data.tiny_url,
+            status: "active",
           });
+          console.log("Document written with ID: ", docRef.id);
+        } catch (e) {
+          console.error("Error adding document: ", e);
+        }
       });
   };
 
@@ -123,8 +97,6 @@ function App() {
         </div>
         <div className="app__center"></div>
         <div className="app__right">
-
-
           {user ? (
             <div className="user__name">
               <div className="name__left">
@@ -183,7 +155,7 @@ function App() {
           more links. Click here
         </span>
       </div>
-      
+
       <div className="app__table">
         <table>
           <thead>
@@ -199,46 +171,50 @@ function App() {
               </td>
             </tr>
           </thead>
-          
-          <tbody>
-            <tr>
-              <td className="td__detail">
-                {shortUrl ? shortUrl : "https://linkly.com/Bn41aCOlnxj"}
-                <div className="copy">
-                  <img src="/copy.png" alt="" />
-                </div>
-              </td>
-              <td className="origina__link">
-                {url ? url : "https://www.twitter.com/tweets/8erelCoihu/"}
-              </td>
-              <td>
-                <div
-                  style={{
-                    height: "auto",
-                    maxWidth: 40,
-                    width: "100%",
-                  }}
-                >
-                  <QRCode
-                    size={256}
-                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                    value={shortUrl}
-                    viewBox={`0 0 256 256`}
-                    bgColor="#73767c"
-                  />
-                </div>
-              </td>
-              <td>1313</td>
-              <td className="status">
-                <span className="active">Active</span>
-                <div className="link__active">
-                  <img src="/link1.png" alt="" />
-                </div>
-              </td>
-              <td> {date ? Date.createdAt() : "_ _ _"}</td>
-            </tr>
 
-            <tr>
+          <tbody>
+            {links?.map((item: any, i: number) => (
+              <tr>
+                <td className="td__detail">
+                  {item.shortlink}
+                  <div className="copy">
+                    <img src="/copy.png" alt="" />
+                  </div>
+                </td>
+                <td className="origina__link">{item.originallink}</td>
+                <td>
+                  <div
+                    style={{
+                      height: "auto",
+                      maxWidth: 40,
+                      width: "100%",
+                    }}
+                  >
+                    <QRCode
+                      size={256}
+                      style={{
+                        height: "auto",
+                        maxWidth: "100%",
+                        width: "100%",
+                      }}
+                      value={item.shortlink}
+                      viewBox={`0 0 256 256`}
+                      bgColor="#73767c"
+                    />
+                  </div>
+                </td>
+                <td>1313</td>
+                <td className="status">
+                  <span className="active">{item.status}</span>
+                  <div className="link__active">
+                    <img src="/link1.png" alt="" />
+                  </div>
+                </td>
+                <td> {item.date}</td>
+              </tr>
+            ))}
+
+            {/* <tr>
               <td className="td__detail">
                 https://linkly.com/Bn41aCOlnxj
                 <div className="copy">
@@ -257,10 +233,12 @@ function App() {
                 </div>
               </td>
               <td>Oct - 10 -2023</td>
-            </tr>
+            </tr> */}
           </tbody>
         </table>
       </div>
+
+      <div className="app__footer"></div>
     </div>
   );
 }
