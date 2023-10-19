@@ -7,7 +7,15 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { signInWithPopup } from "firebase/auth";
 import axios from "axios";
 import Date from "./modules/shared/date";
-import { collection, addDoc, getDocs, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp,
+} from "firebase/firestore";
 import QRCode from "react-qr-code";
 
 function App() {
@@ -15,16 +23,15 @@ function App() {
   const [url, setUrl] = useState();
   const [links, setLinks] = useState<any>();
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(database, "links"),
-      (querySnapshot) => {
-        const newData = querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-        setLinks(newData);
-      }
-    );
+    const q = query(collection(database, "links"), orderBy("date", "desc")); // Change "timestamp" to the actual field you want to use for ordering
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const newData = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setLinks(newData);
+    });
 
     return () => {
       // Unsubscribe when the component unmounts to avoid memory leaks
@@ -174,7 +181,7 @@ function App() {
 
           <tbody>
             {links?.map((item: any, i: number) => (
-              <tr>
+              <tr key={i}>
                 <td className="td__detail">
                   {item.shortlink}
                   <div className="copy">
@@ -210,7 +217,7 @@ function App() {
                     <img src="/link1.png" alt="" />
                   </div>
                 </td>
-                <td> {item.date}</td>
+                <td>{Date.format(item.date)}</td>
               </tr>
             ))}
 
