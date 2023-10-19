@@ -45,9 +45,6 @@ function ShortLink() {
     setNewform(formDelete);
   };
 
-  const saveMultiple = () => {
-    console.log(form);
-  };
   useEffect(() => {
     const q = query(collection(database, "links"), orderBy("date", "desc")); // Change "timestamp" to the actual field you want to use for ordering
 
@@ -88,6 +85,7 @@ function ShortLink() {
 
     console.log(form);
   }, [links]);
+
   const getFirstName = (fullName: any) => {
     const namePart = fullName.split(" ");
     if (namePart.length > 0) {
