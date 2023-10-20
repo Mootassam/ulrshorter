@@ -12,6 +12,7 @@ import {
   saveLink,
   saveMulti,
 } from "./shortLinkService";
+import Message from "../../modules/shared/Message";
 
 export const showLinks = createAsyncThunk<void, string[]>(
   "show/links",
@@ -34,12 +35,13 @@ export const generateShortLink = createAsyncThunk<void, string>(
       thunkAPI.dispatch(shortLoading(true));
       const newUrl = await generateShortLinks(url);
       await saveLink(url, newUrl);
-      //   const phoneNumbers = await generatePhoneNumbers(country);
       thunkAPI.dispatch(shortLoading(false));
       thunkAPI.dispatch(showLinks([]));
+      Message.Success("Successfully");
     } catch (error) {
       thunkAPI.dispatch(shortLoading(false));
       console.log("Error generating numbers", error);
+      Message.Success(error);
     }
   }
 );
@@ -55,9 +57,11 @@ export const generateShortMulti = createAsyncThunk<void, any[]>(
       await saveLink(url, newUrl);
       thunkAPI.dispatch(multiLoading(false));
       thunkAPI.dispatch(showLinks([]));
+      Message.Success("Successfully");
     } catch (error) {
       thunkAPI.dispatch(multiLoading(false));
       console.log("Error generating numbers", error);
+      Message.Success(error);
     }
   }
 );

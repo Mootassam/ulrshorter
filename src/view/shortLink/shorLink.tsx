@@ -21,6 +21,7 @@ import {
   shortLoading,
 } from "../../store/shortLink/shortLinkSelectors";
 import LinkTable from "../TableView/LinkTable";
+import { Toaster } from "react-hot-toast";
 
 function ShortLink() {
   const [user] = useAuthState(auth);
@@ -252,6 +253,7 @@ function ShortLink() {
       )}
 
       <div className="app__footer"></div>
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 }
