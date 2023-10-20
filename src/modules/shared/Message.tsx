@@ -6,7 +6,7 @@ class Message {
   }
 
   static Error(message) {
-    return toast.error("This didn't work.");
+    return toast.error(message);
   }
 }
 

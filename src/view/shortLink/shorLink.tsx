@@ -4,9 +4,10 @@ import "firebase/compat/auth";
 import "firebase/compat/database";
 import { auth, provider } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { signInWithPopup } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  LoginIn,
+  Logout,
   generateShortLink,
   generateShortMulti,
   showLinks,
@@ -14,14 +15,17 @@ import {
 import { ThunkDispatch } from "redux-thunk";
 import { AnyAction } from "redux";
 import {
+  LogoutLoading,
   fetchLoading,
   hasRows,
   listLinks,
+  loginLoading,
   multiLoading,
   shortLoading,
 } from "../../store/shortLink/shortLinkSelectors";
 import LinkTable from "../TableView/LinkTable";
 import { Toaster } from "react-hot-toast";
+import { onAuthStateChanged } from "@firebase/auth";
 
 function ShortLink() {
   const [user] = useAuthState(auth);
@@ -33,6 +37,10 @@ function ShortLink() {
   const coutRows = useSelector(hasRows);
   const shortLoadign = useSelector(shortLoading);
   const loadingMulti = useSelector(multiLoading);
+
+  const LoadingLogin = useSelector(loginLoading);
+  const logoutLoading = useSelector(LogoutLoading);
+
   const [form, setNewform] = useState<{ link: string }[]>([
     {
       link: "",
@@ -52,13 +60,19 @@ function ShortLink() {
     setNewform(formDelete);
   };
 
-  const FetchLinks = async () => {
-    await dispatch(showLinks([]));
-  };
+
 
   useEffect(() => {
-    FetchLinks();
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // If a user is logged in, call showLinks with their UID
+        dispatch(showLinks(user.uid));
+      }
+    });
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe();
+  }, [dispatch]);
 
   const showLink = () => {
     setShow(true);
@@ -74,13 +88,13 @@ function ShortLink() {
 
   const signIn = async () => {
     try {
-      await signInWithPopup(auth, provider);
+      dispatch(LoginIn(""));
     } catch (error) {
       alert(error);
     }
   };
   const signOut = () => {
-    auth.signOut();
+    dispatch(Logout(""));
   };
 
   const handletext = (event: any) => {
@@ -104,8 +118,6 @@ function ShortLink() {
   const SaveMultiLinks = async () => {
     dispatch(generateShortMulti(form));
   };
-
-  console.log(auth.currentUser);
 
   return (
     <div className="app">
@@ -136,12 +148,16 @@ function ShortLink() {
           ) : (
             <div className="app__login" onClick={signIn}>
               Login
+              {LoadingLogin ? (
+                <div className="spinners"></div>
+              ) : (
+                <img src={"/signin.png"} alt="" />
+              )}
             </div>
           )}
 
           {user && (
             <div className="app__register" onClick={signOut}>
-              {" "}
               Sign Out
             </div>
           )}

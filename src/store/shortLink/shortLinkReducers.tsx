@@ -7,6 +7,7 @@ const generateSlice = createSlice({
     loginLoading: false,
     multiLoading: false,
     showLoading: false,
+    logoutLoading: false,
     links: [],
   },
   reducers: {
@@ -20,6 +21,10 @@ const generateSlice = createSlice({
       state.multiLoading = actions.payload;
     },
 
+    logoutLoading: (state, actions) => {
+      state.logoutLoading = actions.payload;
+    },
+
     getLoading: (state, actions) => {
       state.showLoading = actions.payload;
     },
@@ -30,7 +35,13 @@ const generateSlice = createSlice({
   },
 });
 
-export const { shortLoading, loginLoading, getLoading, multiLoading, setLink } =
-  generateSlice.actions;
+export const {
+  shortLoading,
+  loginLoading,
+  getLoading,
+  multiLoading,
+  setLink,
+  logoutLoading,
+} = generateSlice.actions;
 
 export default generateSlice.reducer;

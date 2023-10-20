@@ -23,3 +23,13 @@ export const multiLoading = createSelector(
   selectState,
   (state) => state.multiLoading
 );
+
+export const loginLoading = createSelector(
+  selectState,
+  (select) => select.loginLoading
+);
+
+export const LogoutLoading = createSelector(
+  selectState,
+  (select) => select.logoutLoading
+);

@@ -5,21 +5,24 @@ import {
   getLoading,
   setLink,
   multiLoading,
+  logoutLoading,
 } from "./shortLinkReducers";
 import {
   generateShortLinks,
   fetchLinks,
   saveLink,
   saveMulti,
+  loginService,
+  logoutService,
 } from "./shortLinkService";
 import Message from "../../modules/shared/Message";
 
-export const showLinks = createAsyncThunk<void, string[]>(
+export const showLinks = createAsyncThunk<void, any>(
   "show/links",
-  async (_, thunkAPI) => {
+  async (user, thunkAPI) => {
     try {
       thunkAPI.dispatch(getLoading(true));
-      const links = await fetchLinks();
+      const links = await fetchLinks(user);
       thunkAPI.dispatch(setLink(links));
       thunkAPI.dispatch(getLoading(false));
     } catch (error) {
@@ -66,16 +69,30 @@ export const generateShortMulti = createAsyncThunk<void, any[]>(
   }
 );
 
-export const LoginIn = createAsyncThunk<void, string>(
-  "generate/generateNumbers",
+export const LoginIn = createAsyncThunk<void, any>(
+  "login/in",
   async (_, thunkAPI) => {
     try {
       thunkAPI.dispatch(loginLoading(true));
-      //   const phoneNumbers = await generatePhoneNumbers(country);
-
+      const userId = await loginService();
+      thunkAPI.dispatch(showLinks(userId?.user.uid));
       thunkAPI.dispatch(loginLoading(false));
     } catch (error) {
       thunkAPI.dispatch(loginLoading(false));
+      console.log("Error generating numbers", error);
+    }
+  }
+);
+export const Logout = createAsyncThunk<void, any>(
+  "login/in",
+  async (_, thunkAPI) => {
+    try {
+      thunkAPI.dispatch(logoutLoading(true));
+      const userId = await logoutService();
+      thunkAPI.dispatch(showLinks(""));
+      thunkAPI.dispatch(logoutLoading(false));
+    } catch (error) {
+      thunkAPI.dispatch(logoutLoading(false));
       console.log("Error generating numbers", error);
     }
   }
