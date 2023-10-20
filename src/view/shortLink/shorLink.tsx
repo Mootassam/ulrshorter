@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./shorLink.css";
 import "firebase/compat/auth";
 import "firebase/compat/database";
-import { auth, provider } from "../../firebase";
+import { auth } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -15,7 +15,6 @@ import {
 import { ThunkDispatch } from "redux-thunk";
 import { AnyAction } from "redux";
 import {
-  LogoutLoading,
   fetchLoading,
   hasRows,
   listLinks,
@@ -37,9 +36,7 @@ function ShortLink() {
   const coutRows = useSelector(hasRows);
   const shortLoadign = useSelector(shortLoading);
   const loadingMulti = useSelector(multiLoading);
-
   const LoadingLogin = useSelector(loginLoading);
-  const logoutLoading = useSelector(LogoutLoading);
 
   const [form, setNewform] = useState<{ link: string }[]>([
     {
@@ -59,8 +56,6 @@ function ShortLink() {
     formDelete.splice(index, 1);
     setNewform(formDelete);
   };
-
-
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -102,7 +97,7 @@ function ShortLink() {
     setUrl(value);
   };
 
-  const generateShortUrl = async (url: string) => {
+  const generateShortUrl = async () => {
     dispatch(generateShortLink(url));
   };
 
@@ -131,7 +126,7 @@ function ShortLink() {
             <div className="user__name">
               <div className="left__image">
                 <img
-                  src={user?.photoURL}
+                  src={user.photoURL || "/default-profile-image.png"}
                   alt=""
                   width={34}
                   height={34}
@@ -185,14 +180,7 @@ function ShortLink() {
                 placeholder="Enter the link here"
               />
             </div>
-            <div
-              className="short__now"
-              onClick={() =>
-                generateShortUrl(
-                  "https://medium.com/@aleemuddin13/how-to-host-static-website-on-firebase-hosting-for-free-9de8917bebf2"
-                )
-              }
-            >
+            <div className="short__now" onClick={() => generateShortUrl()}>
               {!shortLoadign && <>Shorten Now!</>}
 
               {shortLoadign && (

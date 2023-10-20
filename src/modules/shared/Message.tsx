@@ -1,8 +1,8 @@
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 class Message {
   static Success(message) {
-    return toast.success("Successfully!");
+    return toast.success(message);
   }
 
   static Error(message) {

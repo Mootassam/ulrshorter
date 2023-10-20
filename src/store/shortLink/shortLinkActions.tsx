@@ -31,7 +31,7 @@ export const showLinks = createAsyncThunk<void, any>(
     }
   }
 );
-export const generateShortLink = createAsyncThunk<void, string>(
+export const generateShortLink = createAsyncThunk<void, any>(
   "generate/generateShortLink",
   async (url, thunkAPI) => {
     try {
@@ -88,7 +88,7 @@ export const Logout = createAsyncThunk<void, any>(
   async (_, thunkAPI) => {
     try {
       thunkAPI.dispatch(logoutLoading(true));
-      const userId = await logoutService();
+       await logoutService();
       thunkAPI.dispatch(showLinks(""));
       thunkAPI.dispatch(logoutLoading(false));
     } catch (error) {

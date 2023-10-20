@@ -9,6 +9,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
+  "package-manager": "yarn",
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.7",
     "axios": "^1.5.1",

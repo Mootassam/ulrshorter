@@ -3,7 +3,6 @@ import {
   collection,
   onSnapshot,
   query,
-  orderBy,
   addDoc,
   where,
 } from "firebase/firestore";
@@ -16,7 +15,7 @@ export const fetchLinks = async (user) => {
   try {
     const q = query(collection(database, "links"), where("userId", "==", user));
     return new Promise<any[]>((resolve, reject) => {
-      const unsubscribe = onSnapshot(
+      onSnapshot(
         q,
         (querySnapshot) => {
           const data = querySnapshot.docs.map((doc) => ({
