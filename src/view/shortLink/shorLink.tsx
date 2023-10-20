@@ -154,6 +154,9 @@ function ShortLink() {
                 type="text"
                 className="url__short"
                 onChange={() => handletext(event)}
+                typeof="url"
+                required
+                placeholder="Enter the link here"
               />
             </div>
             <div
