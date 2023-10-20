@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./shorLink.css";
 import "firebase/compat/auth";
 import "firebase/compat/database";
-import { auth, database, provider } from "../../firebase";
+import { auth, provider } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { signInWithPopup } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
@@ -105,6 +105,8 @@ function ShortLink() {
     dispatch(generateShortMulti(form));
   };
 
+  console.log(auth.currentUser);
+
   return (
     <div className="app">
       <div className="app__header">
@@ -115,19 +117,20 @@ function ShortLink() {
         <div className="app__right">
           {user ? (
             <div className="user__name">
-              <div className="name__left">
+              <div className="left__image">
+                <img
+                  src={user?.photoURL}
+                  alt=""
+                  width={34}
+                  height={34}
+                  className="image__profile"
+                />
+              </div>
+              <div className="left__user">
                 <span className="welcome"> Welcome</span>
                 <span className="user__loginame">
                   {getFirstName(user.displayName)}
                 </span>
-              </div>
-              <div className="name__right">
-                <label htmlFor="toggleDropdown" className="name__right-label">
-                  <img src="/down.png" alt="" />
-                </label>
-              </div>
-              <div className="dropdwon" onClick={signOut}>
-                <label className="signout">Sign Out</label>
               </div>
             </div>
           ) : (
@@ -135,7 +138,13 @@ function ShortLink() {
               Login
             </div>
           )}
-          <div className="app__register"> Register</div>
+
+          {user && (
+            <div className="app__register" onClick={signOut}>
+              {" "}
+              Sign Out
+            </div>
+          )}
         </div>
       </div>
 
