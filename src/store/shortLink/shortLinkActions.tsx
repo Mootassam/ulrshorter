@@ -4,6 +4,7 @@ import {
   loginLoading,
   getLoading,
   setLink,
+  multiLoading,
 } from "./shortLinkReducers";
 import {
   generateShortLinks,
@@ -46,14 +47,14 @@ export const generateShortMulti = createAsyncThunk<void, any[]>(
   "generate/generateShortMulti",
   async (form, thunkAPI) => {
     try {
-      thunkAPI.dispatch(shortLoading(true));
+      thunkAPI.dispatch(multiLoading(true));
       const idDoc = await saveMulti(form);
       const url = window.location.href + "detail/" + idDoc;
       const newUrl = await generateShortLinks(url);
       await saveLink(url, newUrl);
-      thunkAPI.dispatch(shortLoading(false));
+      thunkAPI.dispatch(multiLoading(false));
     } catch (error) {
-      thunkAPI.dispatch(shortLoading(false));
+      thunkAPI.dispatch(multiLoading(false));
       console.log("Error generating numbers", error);
     }
   }

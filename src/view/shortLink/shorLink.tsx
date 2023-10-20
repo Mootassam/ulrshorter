@@ -17,6 +17,7 @@ import {
   fetchLoading,
   hasRows,
   listLinks,
+  multiLoading,
   shortLoading,
 } from "../../store/shortLink/shortLinkSelectors";
 import LinkTable from "../TableView/LinkTable";
@@ -30,6 +31,7 @@ function ShortLink() {
   const allLinks = useSelector(listLinks);
   const coutRows = useSelector(hasRows);
   const shortLoadign = useSelector(shortLoading);
+  const loadingMulti = useSelector(multiLoading);
   const [form, setNewform] = useState<{ link: string }[]>([
     {
       link: "",
@@ -166,7 +168,6 @@ function ShortLink() {
 
               {shortLoadign && (
                 <div className="shorten">
-             
                   Shorten ... <div className="spinners"></div>{" "}
                 </div>
               )}
@@ -235,7 +236,12 @@ function ShortLink() {
                 Cancel Now!
               </div>
               <div className="save__now" onClick={SaveMultiLinks}>
-                Save Now!
+                {!loadingMulti && <>Save Now!</>}
+                {loadingMulti && (
+                  <div className="shorten">
+                    Shorten ... <div className="spinners"></div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

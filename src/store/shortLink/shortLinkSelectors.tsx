@@ -18,3 +18,8 @@ export const shortLoading = createSelector(
   selectState,
   (state) => state.shortLoading
 );
+
+export const multiLoading = createSelector(
+  selectState,
+  (state) => state.multiLoading
+);
