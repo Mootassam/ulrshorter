@@ -5,12 +5,19 @@ import {
   getLoading,
   setLink,
 } from "./shortLinkReducers";
-import { generateShortLinks, fetchLinks } from "./shortLinkService";
+import {
+  generateShortLinks,
+  fetchLinks,
+  saveLink,
+  saveMulti,
+} from "./shortLinkService";
 export const generateShortLink = createAsyncThunk<void, string>(
   "generate/generateShortLink",
-  async (_, thunkAPI) => {
+  async (url, thunkAPI) => {
     try {
       thunkAPI.dispatch(shortLoading(true));
+      const newUrl = await generateShortLinks(url);
+      await saveLink(url, newUrl);
       //   const phoneNumbers = await generatePhoneNumbers(country);
       thunkAPI.dispatch(shortLoading(false));
     } catch (error) {
@@ -25,7 +32,7 @@ export const showLinks = createAsyncThunk<void, string[]>(
   async (_, thunkAPI) => {
     try {
       thunkAPI.dispatch(getLoading(true));
-      const links = fetchLinks();
+      const links = await fetchLinks();
       thunkAPI.dispatch(setLink(links));
       thunkAPI.dispatch(getLoading(false));
     } catch (error) {
@@ -35,12 +42,15 @@ export const showLinks = createAsyncThunk<void, string[]>(
   }
 );
 
-export const generateShortMulti = createAsyncThunk<void, string>(
+export const generateShortMulti = createAsyncThunk<void, any[]>(
   "generate/generateShortMulti",
-  async (link, thunkAPI) => {
+  async (form, thunkAPI) => {
     try {
       thunkAPI.dispatch(shortLoading(true));
-      await generateShortLinks(link);
+      const idDoc = await saveMulti(form);
+      const url = window.location.href + "detail/" + idDoc;
+      const newUrl = await generateShortLinks(url);
+      await saveLink(url, newUrl);
       thunkAPI.dispatch(shortLoading(false));
     } catch (error) {
       thunkAPI.dispatch(shortLoading(false));

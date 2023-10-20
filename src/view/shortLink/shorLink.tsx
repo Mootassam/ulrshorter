@@ -5,31 +5,36 @@ import "firebase/compat/database";
 import { auth, database, provider } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { signInWithPopup } from "firebase/auth";
-import Date from "../../modules/shared/date";
-
+import { useDispatch, useSelector } from "react-redux";
 import {
-  collection,
-  addDoc,
-  onSnapshot,
-  query,
-  orderBy,
-} from "firebase/firestore";
-import QRCode from "react-qr-code";
-import authAxios from "../../modules/shared/axios/authAxios";
+  generateShortLink,
+  generateShortMulti,
+  showLinks,
+} from "../../store/shortLink/shortLinkActions";
+import { ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
+import {
+  fetchLoading,
+  hasRows,
+  listLinks,
+  shortLoading,
+} from "../../store/shortLink/shortLinkSelectors";
+import LinkTable from "../TableView/LinkTable";
 
 function ShortLink() {
   const [user] = useAuthState(auth);
-  const [url, setUrl] = useState();
-  const [links, setLinks] = useState<any>();
-  const [copySuccess, setCopySuccess] = useState(false);
-  const [selected, setSelectedItem] = useState<any>();
+  const dispatch: ThunkDispatch<any, void, AnyAction> = useDispatch();
+  const [url, setUrl] = useState<string>();
   const [show, setShow] = useState(false);
+  const loadingLinks = useSelector(fetchLoading);
+  const allLinks = useSelector(listLinks);
+  const coutRows = useSelector(hasRows);
+  const shortLoadign = useSelector(shortLoading);
   const [form, setNewform] = useState<{ link: string }[]>([
     {
       link: "",
     },
   ]);
-
   const addFields = () => {
     setNewform([
       ...form,
@@ -38,53 +43,23 @@ function ShortLink() {
       },
     ]);
   };
-
   const removeFields = (index: number) => {
     let formDelete = [...form];
     formDelete.splice(index, 1);
     setNewform(formDelete);
   };
 
-  useEffect(() => {
-    const q = query(collection(database, "links"), orderBy("date", "desc")); // Change "timestamp" to the actual field you want to use for ordering
-
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const newData = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      setLinks(newData);
-    });
-
-    return () => {
-      // Unsubscribe when the component unmounts to avoid memory leaks
-      unsubscribe();
-    };
-  }, []);
-
-  const handleCopy = (value: any, index: number) => {
-    const el = document.createElement("textarea");
-    el.value = value;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand("copy");
-    document.body.removeChild(el);
-    setCopySuccess(true);
-    setSelectedItem(index);
-
-    setTimeout(() => {
-      setCopySuccess(false);
-    }, 2000);
+  const FetchLinks = async () => {
+    await dispatch(showLinks([]));
   };
+
+  useEffect(() => {
+    FetchLinks();
+  }, []);
 
   const showLink = () => {
     setShow(true);
   };
-  useEffect(() => {
-    // This will log the data after it has been fetched.
-
-    console.log(form);
-  }, [links]);
 
   const getFirstName = (fullName: any) => {
     const namePart = fullName.split(" ");
@@ -110,24 +85,8 @@ function ShortLink() {
     setUrl(value);
   };
 
-  const shortLink = () => {
-    authAxios
-      .post("/create", {
-        url: url,
-      })
-      .then(async (res) => {
-        try {
-          const docRef = await addDoc(collection(database, "links"), {
-            date: Date.createdAt(),
-            originallink: url,
-            shortlink: res.data.data.tiny_url,
-            status: "active",
-          });
-          console.log("Document written with ID: ", docRef.id);
-        } catch (e) {
-          console.error("Error adding document: ", e);
-        }
-      });
+  const generateShortUrl = async (url: string) => {
+    dispatch(generateShortLink(url));
   };
 
   const handleChange = (
@@ -139,36 +98,10 @@ function ShortLink() {
     setNewform(formN);
   };
 
-  const saveMultipleLinks = async () => {
-    try {
-      const docRefs = await addDoc(collection(database, "multiLinks"), {
-        date: Date.createdAt(),
-        links: form,
-        status: "active",
-      });
-
-      authAxios
-        .post("/create", {
-          url: window.location.href + "detail/" + docRefs.id,
-        })
-        .then(async (res) => {
-          try {
-            const docRef = await addDoc(collection(database, "links"), {
-              date: Date.createdAt(),
-              originallink: window.location.href + "detail/" + docRefs.id,
-              shortlink: res.data.data.tiny_url,
-              status: "active",
-            });
-            console.log("Document written with ID: ", docRef.id);
-          } catch (e) {
-            console.error("Error adding document: ", e);
-          }
-        })
-        .catch(() => {});
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
+  const SaveMultiLinks = async () => {
+    dispatch(generateShortMulti(form));
   };
+
   return (
     <div className="app">
       <div className="app__header">
@@ -221,8 +154,22 @@ function ShortLink() {
                 onChange={() => handletext(event)}
               />
             </div>
-            <div className="short__now" onClick={shortLink}>
-              Shorten Now!
+            <div
+              className="short__now"
+              onClick={() =>
+                generateShortUrl(
+                  "https://medium.com/@aleemuddin13/how-to-host-static-website-on-firebase-hosting-for-free-9de8917bebf2"
+                )
+              }
+            >
+              {!shortLoadign && <>Shorten Now!</>}
+
+              {shortLoadign && (
+                <div className="shorten">
+             
+                  Shorten ... <div className="spinners"></div>{" "}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -239,94 +186,12 @@ function ShortLink() {
         </span>
       </div>
 
-      <div className="app__table">
-        <table>
-          <thead>
-            <tr className="tr__">
-              <td>Short Link</td>
-              <td>Original Link</td>
-              <td>QR Code</td>
-              <td>Clicks</td>
-              <td>Status</td>
-              <td className="date__">
-                Date
-                <img src="/date.png" alt="" />
-              </td>
-            </tr>
-          </thead>
+      <LinkTable
+        allLinks={allLinks}
+        loading={loadingLinks}
+        hasRows={coutRows}
+      />
 
-          <tbody>
-            {links?.map((item: any, i: number) => (
-              <tr key={i}>
-                <td className="td__detail">
-                  {item.shortlink}
-                  <div
-                    className={`copy ${
-                      copySuccess && selected === i ? "copied" : ""
-                    }`}
-                    onClick={() => handleCopy(item.shortlink, i)}
-                  >
-                    <img src="/copy.png" alt="" />
-                  </div>
-                </td>
-                <td className="original__link">{item.originallink}</td>
-                <td>
-                  <div
-                    style={{
-                      height: "auto",
-                      maxWidth: 40,
-                      width: "100%",
-                    }}
-                  >
-                    <QRCode
-                      size={256}
-                      style={{
-                        height: "auto",
-                        maxWidth: "100%",
-                        width: "100%",
-                      }}
-                      value={item.shortlink}
-                      viewBox={`0 0 256 256`}
-                      bgColor="#73767c"
-                    />
-                  </div>
-                </td>
-                <td>1313</td>
-                <td className="status">
-                  <span className="active">{item.status}</span>
-                  <div className="link__active">
-                    <a href={item.shortlink} target="__blank">
-                      <img src="/link1.png" alt="" />
-                    </a>
-                  </div>
-                </td>
-                <td>{Date.format(item.date)}</td>
-              </tr>
-            ))}
-
-            {/* <tr>
-              <td className="td__detail">
-                https://linkly.com/Bn41aCOlnxj
-                <div className="copy">
-                  <img src="/copy.png" alt="" />
-                </div>
-              </td>
-              <td>https://www.twitter.com/tweets/8erelCoihu/</td>
-              <td>
-                <img src="/qrcode.png" alt="" />
-              </td>
-              <td>1313</td>
-              <td className="status">
-                <span className="inactive">Inavtive</span>
-                <div className="link__active">
-                  <img src="/unlink.png" alt="" />
-                </div>
-              </td>
-              <td>Oct - 10 -2023</td>
-            </tr> */}
-          </tbody>
-        </table>
-      </div>
       {show && (
         <div className="app__sidebar">
           <div className="content__plus">
@@ -369,7 +234,7 @@ function ShortLink() {
               <div className="cancel__now" onClick={() => setShow(false)}>
                 Cancel Now!
               </div>
-              <div className="save__now" onClick={saveMultipleLinks}>
+              <div className="save__now" onClick={SaveMultiLinks}>
                 Save Now!
               </div>
             </div>
